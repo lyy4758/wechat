@@ -212,12 +212,35 @@ Wechat.prototype.handleMsg = function(req,res){
                                 that.uploadPicture(urlPath,"image").then(function (media_id) {
                                   reportMsg = msg.imageMsg(fromUser,toUser,media_id)
                                   console.log(media_id)
+                                  fs.appendFile('./wechat/media_id.json', media_id + urlPath + "分割线||||    ",'utf-8',function(err){console.log(err)})
                                    })
                             break;
                             case 'pic':
-                                reportMsg = msg.imageMsg(fromUser, toUser, 'h74cMserfm5X08iBLnem6aJFofcmJsSz7c_SzipduZzu60LXGNiJGa44LgR3SmHp')
+                                reportMsg = msg.imageMsg(fromUser, toUser, 'pSQjeB-0Jf78OPj5OCWYnv6H3-eW_Ld5V5SBNw3hA3-XAdZt-ym-m033cnUaPl9D')
                                 break;
-                            case 'upload':
+                            case 'uploadNews':
+                                   
+                                     var articles = [{
+                                       title: "金刚",
+                                       thumb_media_id: 'pSQjeB-0Jf78OPj5OCWYnv6H3-eW_Ld5V5SBNw3hA3-XAdZt-ym-m033cnUaPl9D',
+                                       author: 'lyy',
+                                       digest: '',
+                                       show_cover_pic: 1,
+                                       content: "你好",
+                                       content_source_url: "http://www.piaohua.com/"
+                                     }]
+                                    // console.log(media_id)
+                                      var newsData = that.uploadNews('news', articles).then(function (media_id) {
+                                        console.log(media_id)
+                                        console.log(newsData)
+                                        //console.log(articles)
+                                        //reportMsg = newsData;
+                                      })
+                                   
+                                   
+                                   
+                                  
+                                   
                                    
                                    break;
                             default:
@@ -305,14 +328,82 @@ Wechat.prototype.uploadPicture = function (urlPath, type) {
     })
   })
 }
+Wechat.prototype.uploadNews = function (type,material) {
+  var that =this
+  return new Promise(function (resolve,reject) {
+    that.getAccessToken().then(function (data) {
+      var form = material
+      console.log(form)
+      var url = util.format(that.apiURL.addNews, that.apiDomain, data)
+      // that.requestPost(url,form).then(function (result) {
+      //   resolve(JSON.parse(result).media_id)
+      // })
+      var opts = {
+        method: 'POST',
+        url: url,
+        json: true
+      }
+      if (type === 'news') {
+        opts.body = form;
+      } else {
+        opts.formData = form;
+      }
+      request(opts).then(function (response) {
+        var _data = response.body;
+        if (_data) {
+          resolve(_data);
+          console.log("success")
+        } else {
+          throw new Error('upload permanent material failed!' + _data.errcode);
+        }
+      }).catch(function (err) {
+        reject(err);
+      })
+      
+    })
+    
+  })
+}
 
 
+// Wechat.prototype.uploadPermMaterial = function (type, material) {
+//   var that = this;
+//   var form = {}
+//   var uploadUrl = '';
+//   if (type === 'pic') uploadUrl = api.uploadPermPics;
+//   if (type === 'other') uploadUrl = api.uploadPermOther;
+//   if (type === 'news') {
+//     uploadUrl = that.apiURL.addNews;
+//     form = material
+//   } else {
+//     form.media = fs.createReadStream(material);
+//   }
+//   return new Promise(function (resolve, reject) {
+//     that.getAccessToken().then(function (data) {
+//       var url = util.format(uploadUrl, that.apiDomain, data)
+//       var opts = {
+//           method: 'POST',
+//           url: url,
+//           json: true
+//         }
+//         (type === 'news') ? (opts.body = form) : (opts.formData = form); //上传数据的方式不同
+//       request(opts).then(function (response) {
+//         var _data = response.body;
+//         if (_data) {
+//           resolve(_data)
+//         } else {
+//           throw new Error('upload permanent material failed!' + _data.errcode);
+//         }
+//       }).catch(function (err) {
+//         reject(err);
+//       });
+//     });
+//   });
+// }
 Wechat.prototype.uploadPermMaterial = function (type, material) {
   var that = this;
   var form = {}
   var uploadUrl = '';
-  if (type === 'pic') uploadUrl = api.uploadPermPics;
-  if (type === 'other') uploadUrl = api.uploadPermOther;
   if (type === 'news') {
     uploadUrl = that.apiURL.addNews;
     form = material
@@ -323,17 +414,24 @@ Wechat.prototype.uploadPermMaterial = function (type, material) {
     that.getAccessToken().then(function (data) {
       var url = util.format(uploadUrl, that.apiDomain, data)
       var opts = {
-          method: 'POST',
-          url: url,
-          json: true
-        }
-        (type == 'news') ? (opts.body = form) : (opts.formData = form); //上传数据的方式不同
+        method: 'POST',
+        url: url,
+        json: true
+      }
+      if (type === 'news') {
+        opts.body = form;
+      } else {
+        opts.formData = form;
+      }
+      console.log(opts.body)
+      console.log(form)
       request(opts).then(function (response) {
         var _data = response.body;
         if (_data) {
-          resolve(_data)
+          resolve(_data);
+          console.log("success")
         } else {
-          throw new Error('upload permanent material failed!' + _data.errcode);
+          throw new Error('upload permanent material failed!'+_data.errcode);
         }
       }).catch(function (err) {
         reject(err);
