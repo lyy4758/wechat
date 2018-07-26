@@ -202,7 +202,7 @@ Wechat.prototype.handleMsg = function(req,res){
                             break;
                             case 'massSend':
                                 var img = {
-                                  media_id: 'h74cMserfm5X08iBLnem6aJFofcmJsSz7c_SzipduZzu60LXGNiJGa44LgR3SmHp'
+                                  media_id: 'ezs27f6_5PiYY5VYZNb7aariApk7SISAMcMBlir9kEA'
                                 }
                                 var msg1 = that.massSendMsg('image', img);
                                 console.log('msg:' + JSON.stringify(msg1));
@@ -216,25 +216,25 @@ Wechat.prototype.handleMsg = function(req,res){
                                    })
                             break;
                             case 'pic':
-                                reportMsg = msg.imageMsg(fromUser, toUser, 'pSQjeB-0Jf78OPj5OCWYnv6H3-eW_Ld5V5SBNw3hA3-XAdZt-ym-m033cnUaPl9D')
+                                reportMsg = msg.imageMsg(fromUser, toUser, 'ezs27f6_5PiYY5VYZNb7aariApk7SISAMcMBlir9kEA')
                                 break;
                             case 'uploadNews':
-                                   
-                                     var articles = [{
-                                       title: "金刚",
-                                       thumb_media_id: 'pSQjeB-0Jf78OPj5OCWYnv6H3-eW_Ld5V5SBNw3hA3-XAdZt-ym-m033cnUaPl9D',
-                                       author: 'lyy',
-                                       digest: '',
-                                       show_cover_pic: 1,
-                                       content: "你好",
-                                       content_source_url: "http://www.piaohua.com/"
-                                     }]
+                                   // var data = that.uploadPermMaterial('image')
+                                    //  var articles = [{
+                                    //    title: "金刚zsd",
+                                    //    thumb_media_id: 'ezs27f6_5PiYY5VYZNb7aariApk7SISAMcMBlir9kEA',
+                                    //    author: 'lyy',
+                                    //    digest: '',
+                                    //    show_cover_pic: 1,
+                                    //    content: "454454你好",
+                                    //    content_source_url: "http://www.piaohua.com/"
+                                    //  }]
                                     // console.log(media_id)
-                                      var newsData = that.uploadNews('news', articles).then(function (media_id) {
-                                        console.log(media_id)
+                                      var newsData = that.uploadNews().then(function (media_id) {
+                                        console.log(media_id + "444444")
                                         console.log(newsData)
                                         //console.log(articles)
-                                        //reportMsg = newsData;
+                                       // reportMsg = newsData;
                                       })
                                    
                                    
@@ -318,7 +318,7 @@ Wechat.prototype.uploadPicture = function (urlPath, type) {
       var form = { //构造表单
         media: fs.createReadStream(urlPath)
       }
-      var url = util.format(that.apiURL.addPicture, that.apiDomain, data, type);
+      var url = util.format(that.apiURL.addPic, that.apiDomain, data, type);
       that.requestPost(url, form).then(function (result) {
         resolve(JSON.parse(result).media_id);
         // that.requestPost(url, JSON.stringify(menus)).then(function (data) {
@@ -328,42 +328,77 @@ Wechat.prototype.uploadPicture = function (urlPath, type) {
     })
   })
 }
-Wechat.prototype.uploadNews = function (type,material) {
-  var that =this
-  return new Promise(function (resolve,reject) {
+Wechat.prototype.uploadNews = function () {
+  var that = this;
+  return new Promise(function (resolve, reject) {
+    
     that.getAccessToken().then(function (data) {
-      var form = material
-      console.log(form)
       var url = util.format(that.apiURL.addNews, that.apiDomain, data)
-      // that.requestPost(url,form).then(function (result) {
-      //   resolve(JSON.parse(result).media_id)
-      // })
-      var opts = {
-        method: 'POST',
-        url: url,
-        json: true
+      var acticle = {
+        method:'POST',
+        url:url,
+        json:true
       }
-      if (type === 'news') {
-        opts.body = form;
-      } else {
-        opts.formData = form;
+      var form = [{
+        title: "金刚zsd",
+        thumb_media_id: 'ezs27f6_5PiYY5VYZNb7aariApk7SISAMcMBlir9kEA',
+        author: 'lyy',
+        digest: '',
+        show_cover_pic: 1,
+        content: "454454你好",
+        content_source_url: "http://www.piaohua.com/"
+      }]
+      acticle.body =form
+      
+    request(acticle).then(function (response) {
+      var _data = response.body
+      if(_data){
+        resolve(_data)
+        console.log(_data.errcode)
       }
-      request(opts).then(function (response) {
-        var _data = response.body;
-        if (_data) {
-          resolve(_data);
-          console.log("success")
-        } else {
-          throw new Error('upload permanent material failed!' + _data.errcode);
-        }
-      }).catch(function (err) {
-        reject(err);
-      })
+      else{
+        throw new Error("upload failed " + _data.errcode)
+      }
+    }).catch(function (err) {
+      reject(err)
+    })
       
     })
-    
   })
 }
+// Wechat.prototype.uploadNews = function (material) {
+//   var that =this
+//   return new Promise(function (resolve,reject) {
+//     that.getAccessToken().then(function (data) {
+//       var form = material
+//       console.log(form)
+//       var url = util.format(that.apiURL.addNews, that.apiDomain, data)
+//       // that.requestPost(url,form).then(function (result) {
+//       //   resolve(JSON.parse(result).media_id)
+//       // })
+//       var opts = {
+//         method: 'POST',
+//         url: url,
+//         json: true
+//       }
+//       opts.body = form;
+//       request(opts).then(function (response) {
+//         var _data = response.body;
+//         if (_data) {
+//           resolve(_data);
+//           console.log("success "+_data.errcode)
+//           console.log(_data.media_id)
+//         } else {
+//           throw new Error('upload permanent material failed!' + _data.errcode);
+//         }
+//       }).catch(function (err) {
+//         reject(err);
+//       })
+      
+//     })
+    
+//   })
+// }
 
 
 // Wechat.prototype.uploadPermMaterial = function (type, material) {
@@ -404,6 +439,9 @@ Wechat.prototype.uploadPermMaterial = function (type, material) {
   var that = this;
   var form = {}
   var uploadUrl = '';
+  if (type === 'pic') {
+    uploadUrl = that.apiURL.addPic;
+  }
   if (type === 'news') {
     uploadUrl = that.apiURL.addNews;
     form = material
