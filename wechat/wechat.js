@@ -201,10 +201,10 @@ Wechat.prototype.handleMsg = function(req,res){
                                 reportMsg = msg.graphicMsg(fromUser,toUser,contentArr);
                             break;
                             case 'massSend':
-                                var img = {
-                                  media_id: 'ezs27f6_5PiYY5VYZNb7aariApk7SISAMcMBlir9kEA'
-                                }
-                                var msg1 = that.massSendMsg('image', img);
+                                // var mpnews = {
+                                //   media_id: 'ezs27f6_5PiYY5VYZNb7afdfEUkLJ_XMZRCR8vSgNEk'
+                                // }
+                                var msg1 = that.massSendMsg('mpnews');
                                 console.log('msg:' + JSON.stringify(msg1));
                             break;
                             case "uploadPic":
@@ -216,7 +216,7 @@ Wechat.prototype.handleMsg = function(req,res){
                                    })
                             break;
                             case 'pic':
-                                reportMsg = msg.imageMsg(fromUser, toUser, 'ezs27f6_5PiYY5VYZNb7aariApk7SISAMcMBlir9kEA')
+                                reportMsg = msg.imageMsg(fromUser, toUser, 'ezs27f6_5PiYY5VYZNb7aQ6MoXU1VWyz4x7hwU5DuZY')
                                 break;
                             case 'uploadNews':
                                    // var data = that.uploadPermMaterial('image')
@@ -236,7 +236,9 @@ Wechat.prototype.handleMsg = function(req,res){
                                         //console.log(articles)
                                        // reportMsg = newsData;
                                       })
-                                   
+                            case 'News':
+                                     reportMsg = msg.newsMsg (fromUser, toUser, 'ezs27f6_5PiYY5VYZNb7adXxE-FaamY1i77rCJjhcVQ')
+                            break;       
                                    
                                    
                                   
@@ -278,16 +280,23 @@ Wechat.prototype.handleMsg = function(req,res){
       
   
 // }
-Wechat.prototype.massSendMsg = function (type, message) {
+Wechat.prototype.massSendMsg = function (type) {
   var that = this;
   var msg = {
-    filter: {},
-    msgtype: type
+    "filter": {
+      "tag_id": 2,
+      "is_to_all" :true
+    },
+    "mpnews":{
+      "media_id":"ezs27f6_5PiYY5VYZNb7afdfEUkLJ_XMZRCR8vSgNEk"
+    },
+    "msgtype":type,
+    "send_ignore_reprint": 0
   }
   
-  msg.filter.is_to_all = true
+  // msg.filter.is_to_all = true
   
-  msg[type] = message;
+  //msg[type] = message;
  return new Promise(function (resolve, reject) {
     that.getAccessToken().then(function (data) {
       var url = util.format(that.apiURL.sendAll, that.apiDomain, data)
@@ -334,27 +343,29 @@ Wechat.prototype.uploadNews = function () {
     
     that.getAccessToken().then(function (data) {
       var url = util.format(that.apiURL.addNews, that.apiDomain, data)
-      var acticle = {
+      var article = {
         method:'POST',
         url:url,
         json:true
       }
-      var form = [{
+      article.body={"articles": [{
         title: "金刚zsd",
         thumb_media_id: 'ezs27f6_5PiYY5VYZNb7aariApk7SISAMcMBlir9kEA',
         author: 'lyy',
-        digest: '',
+        digest: '123',
         show_cover_pic: 1,
         content: "454454你好",
         content_source_url: "http://www.piaohua.com/"
-      }]
-      acticle.body =form
+      },]}
+      //acticle.body =form
       
-    request(acticle).then(function (response) {
+    request(article).then(function (response) {
       var _data = response.body
       if(_data){
         resolve(_data)
-        console.log(_data.errcode)
+        console.log(article)
+        console.log("111"+_data.errcode)
+        console.log(_data)
       }
       else{
         throw new Error("upload failed " + _data.errcode)

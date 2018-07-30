@@ -63,3 +63,12 @@ exports.imageMsg = function (toUser, fromUser, media_id) {
     xmlContent += "<Image><MediaId><![CDATA[" + media_id + "]]></MediaId></Image></xml>";
     return xmlContent;
 }
+
+exports.newsMsg = function (toUser,fromUser,media_id) {
+    var xmlContent = "<xml><ToUserName><![CDATA[" + toUser + "]]></ToUserName>";
+    xmlContent += "<FromUserName><![CDATA[" + fromUser + "]]></FromUserName>";
+    xmlContent += "<CreateTime>" + new Date().getTime() + "</CreateTime>";
+    xmlContent += "<MsgType><![CDATA[mpnews]]></MsgType>";
+    xmlContent += "<Mpnews><MediaId><![CDATA[" + media_id + "]]></MediaId></Mpnews></xml>";
+    return xmlContent;
+}
